@@ -1,10 +1,12 @@
-name: Deploy Hugo Site
+name: Deploy Hugo Site to GH Pages
 
 on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [main]
+    branches: [ "master" ]
   pull_request:
-    branches: [main]
+    branches: [ "master" ]
+
 
 jobs:
   build:
