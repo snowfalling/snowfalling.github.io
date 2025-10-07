@@ -25,6 +25,12 @@ jobs:
           hugo-version: '0.120.4'  # 使用稳定版本
           extended: true
 
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
       - name: Build
         run: hugo --minify
 
