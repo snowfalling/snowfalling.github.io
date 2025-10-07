@@ -1,0 +1,59 @@
+baseURL: "https://snowfalling.github.io/"
+title: "我的技术博客"
+paginate: 5
+theme: "PaperMod"
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+minify:
+  disableXML: true
+  minifyOutput: true
+
+params:
+  defaultTheme: auto
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  hideMenu: false
+  showShareButtons: false
+  showReadingTime: true
+  env: production
+  title: "我的技术博客"
+  description: "分享技术知识和生活感悟"
+  keywords: [博客, 技术, 编程]
+  author: "Ronald"
+  images: ["/icon.png"]
+  
+  # 社交链接
+  socialIcons:
+    - name: github
+      url: "https://github.com/snowfalling"
+    - name: email
+      url: "mailto:snowfalling0912@gmail.com"
+
+menu:
+  main:
+    - identifier: home
+      name: 首页
+      url: /
+      weight: 10
+    - identifier: archives
+      name: 归档
+      url: archives/
+      weight: 20
+    - identifier: search
+      name: 搜索
+      url: search/
+      weight: 30
+    - identifier: about
+      name: 关于
+      url: about/
+      weight: 40
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
