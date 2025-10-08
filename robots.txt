@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://snowfalling.github.io/sitemap.xml
