@@ -1,6 +1,7 @@
 baseURL: "https://snowfalling.github.io/"
 title: "我的技术博客"
-paginate: 5
+pagination:
+  pagerSize: 10
 theme: "PaperMod"
 
 enableRobotsTXT: true
