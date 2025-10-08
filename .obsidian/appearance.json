@@ -1,0 +1,9 @@
+{
+  "cssTheme": "Minimal",
+  "theme": "obsidian",
+  "baseFontSizeAction": true,
+  "textFontFamily": "Lucida Sans Typewriter,Consolas",
+  "interfaceFontFamily": "Consolas",
+  "monospaceFontFamily": "Consolas",
+  "nativeMenus": false
+}
