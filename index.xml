@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Ronald's Blog</title><link>https://snowfalling.github.io/</link><description>Recent content on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 01 Jul 2026 21:35:17 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Claude Code 中国时区/域名检测机制实证</title><link>https://snowfalling.github.io/posts/ai/claude-code-%E4%B8%AD%E5%9B%BD%E6%97%B6%E5%8C%BA%E5%9F%9F%E5%90%8D%E6%A3%80%E6%B5%8B%E6%9C%BA%E5%88%B6%E5%AE%9E%E8%AF%81/</link><pubDate>Wed, 01 Jul 2026 21:35:17 +0800</pubDate><guid>https://snowfalling.github.io/posts/ai/claude-code-%E4%B8%AD%E5%9B%BD%E6%97%B6%E5%8C%BA%E5%9F%9F%E5%90%8D%E6%A3%80%E6%B5%8B%E6%9C%BA%E5%88%B6%E5%AE%9E%E8%AF%81/</guid><description>&lt;h1 id="claude-code-中国时区域名检测机制实证"&gt;Claude Code 中国时区/域名检测机制实证&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ronald's Blog</title><link>https://snowfalling.github.io/</link><description>Recent content on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 01 Jul 2026 21:35:17 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Claude Code 中国时区/域名检测机制实证</title><link>https://snowfalling.github.io/posts/ai/claude-code-%E4%B8%AD%E5%9B%BD%E6%97%B6%E5%8C%BA%E5%9F%9F%E5%90%8D%E6%A3%80%E6%B5%8B%E6%9C%BA%E5%88%B6%E5%AE%9E%E8%AF%81/</link><pubDate>Wed, 01 Jul 2026 21:35:17 +0800</pubDate><guid>https://snowfalling.github.io/posts/ai/claude-code-%E4%B8%AD%E5%9B%BD%E6%97%B6%E5%8C%BA%E5%9F%9F%E5%90%8D%E6%A3%80%E6%B5%8B%E6%9C%BA%E5%88%B6%E5%AE%9E%E8%AF%81/</guid><description>&lt;h1 id="claude-code-中国时区域名检测机制实证"&gt;
+ Claude Code 中国时区/域名检测机制实证
+ 
+&lt;/h1&gt;
 &lt;p&gt;对 Claude Code CLI 二进制中一段隐蔽逻辑的分析记录。该逻辑基于系统时区、&lt;code&gt;ANTHROPIC_BASE_URL&lt;/code&gt; 域名、以及中国 AI Lab 关键字，改变注入到模型 system prompt 中的日期格式与撇号字符。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;环境：macOS Darwin 25.4.0，&lt;code&gt;Asia/Shanghai&lt;/code&gt;&lt;/li&gt;
@@ -6,15 +9,95 @@
 &lt;li&gt;记录日期：2026-07-01&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id="一背景"&gt;一、背景&lt;/h2&gt;
+
+
+&lt;h2 id="一背景"&gt;
+ 一、背景
+ 
+ &lt;a class="heading-anchor" href="#%e4%b8%80%e8%83%8c%e6%99%af" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
 &lt;p&gt;偶然刷到公众号，说是claude有针对中国区的特殊验证逻辑，后来在一些网站上看了下确有此事。近几天开发编程工作用claude还是蛮顺手的，所以试着想想看能否找到claude的相关代码&lt;/p&gt;
-&lt;h2 id="二与claude的对话沟通"&gt;二、与claude的对话沟通&lt;/h2&gt;
+
+
+&lt;h2 id="二与claude的对话沟通"&gt;
+ 二、与claude的对话沟通
+ 
+ &lt;a class="heading-anchor" href="#%e4%ba%8c%e4%b8%8eclaude%e7%9a%84%e5%af%b9%e8%af%9d%e6%b2%9f%e9%80%9a" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
 &lt;p&gt;对claude进行提问&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;检查系统时区是否匹配 Asia/Shanghai 或 Asia/Urumqi。&lt;/p&gt;
-&lt;p&gt;检查你的代理 URL 是否是中国域名，是否匹配某个域名列表，或者是否包含某个中国 AI Lab。&lt;/p&gt;
-&lt;p&gt;基于上述两项检查，Anthropic 会修改 system prompt 中的日期部分。&lt;/p&gt;
-&lt;p&gt;如果系统时区被判断为中国，日期格式会从 2026-06-30 变成 2026/06/30。同时，根据代理 URL 的不同，Today&amp;rsquo;s date is 中的撇号也会发生变化：&lt;/p&gt;
-&lt;p&gt;如果是中国域名，或者匹配域名白名单，但不是 AI Lab：使用 \u2019，即 “right single quotation mark”——’&lt;/p&gt;
-&lt;p&gt;如果不是中国域名，或者匹配域名白名单，但是中国 AI Lab：使用 \u02BC，即 “modifier letter apostrophe”——ʼ&lt;/p&gt;
-&lt;p&gt;如果是中国域名，或者匹配域名白名单，且同时是中国 AI Lab：使用 \u02B9，即 “modifier letter prime”——ʹ&lt;/p&gt;</description></item><item><title>PECS原则</title><link>https://snowfalling.github.io/posts/java/pecs%E5%8E%9F%E5%88%99/</link><pubDate>Thu, 25 Jun 2026 20:54:41 +0800</pubDate><guid>https://snowfalling.github.io/posts/java/pecs%E5%8E%9F%E5%88%99/</guid><description>JAVA的PCES理解</description></item><item><title>Git Submodule 实战指南：从入门到日常使用</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 16 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid><description>结合 Hugo 博客中管理 PaperMod 主题的真实场景，系统梳理 Git Submodule 的核心概念、常用操作和踩坑经验。</description></item><item><title>使用 Hugo + Obsidian + GitHub Pages 搭建个人博客</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</link><pubDate>Thu, 11 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</guid><description>记录从零搭建基于 Hugo 的个人博客全过程，实现 Obsidian 写作、自动构建、GitHub Pages 部署的完整工作流。</description></item></channel></rss>
+
+
+ &lt;blockquote&gt;&lt;p&gt;检查系统时区是否匹配 Asia/Shanghai 或 Asia/Urumqi。&lt;/p&gt;
+&lt;p&gt;检查你的代理 URL 是否是中国域名，是否匹配某个域名列表，或者是否包含某个中国 AI Lab。&lt;/p&gt;</description></item><item><title>PECS原则</title><link>https://snowfalling.github.io/posts/java/pecs%E5%8E%9F%E5%88%99/</link><pubDate>Thu, 25 Jun 2026 20:54:41 +0800</pubDate><guid>https://snowfalling.github.io/posts/java/pecs%E5%8E%9F%E5%88%99/</guid><description>&lt;p&gt;PECS 是 Java 泛型中的一个实用准则，全称是 &lt;strong&gt;Producer Extends, Consumer Super&lt;/strong&gt;，由 Joshua Bloch 在《Effective Java》中提出。核心思想是：如果一个参数化类型是数据的&lt;strong&gt;生产者&lt;/strong&gt;（你从中读取），用 &lt;code&gt;? extends T&lt;/code&gt;；如果是数据的&lt;strong&gt;消费者&lt;/strong&gt;（你往里写入），用 &lt;code&gt;? super T&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;为什么需要它？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Java 的泛型是不变的（invariant）：&lt;code&gt;List&amp;lt;Dog&amp;gt;&lt;/code&gt; 不是 &lt;code&gt;List&amp;lt;Animal&amp;gt;&lt;/code&gt; 的子类型，即使 &lt;code&gt;Dog extends Animal&lt;/code&gt;。通配符是打破这个限制的方式，而 PECS 告诉你该选哪种通配符。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Producer Extends（读取用 extends）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;当你只需要从集合中&lt;strong&gt;取出&lt;/strong&gt;元素时：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;extends&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Number&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Number&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;doubleValue&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 读取，OK&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// list.add(1); // 编译错误！不能写入&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样 &lt;code&gt;List&amp;lt;Integer&amp;gt;&lt;/code&gt;、&lt;code&gt;List&amp;lt;Double&amp;gt;&lt;/code&gt; 都能传进来。编译器知道取出的一定是 &lt;code&gt;Number&lt;/code&gt; 的子类，所以读取安全；但不知道具体是哪个子类，所以禁止写入。&lt;/p&gt;</description></item><item><title>Git Submodule 实战指南：从入门到日常使用</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 16 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid><description>&lt;h2 id="什么是-git-submodule"&gt;
+ 什么是 Git Submodule
+ 
+ &lt;a class="heading-anchor" href="#%e4%bb%80%e4%b9%88%e6%98%af-git-submodule" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;Git Submodule 允许你在一个 Git 仓库中嵌套另一个独立的 Git 仓库。父仓库只记录子仓库的&lt;strong&gt;特定 commit&lt;/strong&gt;，而不是子仓库的全部内容。&lt;/p&gt;
+&lt;p&gt;典型使用场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;项目依赖第三方库，且需要锁定版本（如 Hugo 主题）&lt;/li&gt;
+&lt;li&gt;多个项目共享同一组公共模块&lt;/li&gt;
+&lt;li&gt;主项目和子项目需要独立的版本控制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以本博客为例，目录结构如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Blog/ # 父仓库（私有）
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── .gitmodules # 子模块配置文件
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── content/posts/ # 博客文章
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── themes/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └── PaperMod/ # 子模块 → hugo-PaperMod 仓库
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── hugo.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id="添加子模块"&gt;
+ 添加子模块
+ 
+ &lt;a class="heading-anchor" href="#%e6%b7%bb%e5%8a%a0%e5%ad%90%e6%a8%a1%e5%9d%97" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 将 PaperMod 主题作为子模块添加到 themes/PaperMod&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行后会产生两个变化：&lt;/p&gt;</description></item><item><title>使用 Hugo + Obsidian + GitHub Pages 搭建个人博客</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</link><pubDate>Thu, 11 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</guid><description>&lt;h2 id="为什么选择这套方案"&gt;
+ 为什么选择这套方案
+ 
+ &lt;a class="heading-anchor" href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%80%89%e6%8b%a9%e8%bf%99%e5%a5%97%e6%96%b9%e6%a1%88" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;在选择博客方案时，我有几个核心需求：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;用 Obsidian 写作&lt;/strong&gt; — 日常笔记和博客统一管理，不想切换工具&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;私有内容保护&lt;/strong&gt; — 有些笔记是私密的，不能发布到公网&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自动化部署&lt;/strong&gt; — 推送即发布，不想手动操作&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;免费托管&lt;/strong&gt; — GitHub Pages 完美满足&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;最终方案：Obsidian 写作 → GitHub 私有仓库 → Hugo 构建 → GitHub Pages 部署。&lt;/p&gt;
+
+
+&lt;h2 id="架构概览"&gt;
+ 架构概览
+ 
+ &lt;a class="heading-anchor" href="#%e6%9e%b6%e6%9e%84%e6%a6%82%e8%a7%88" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Obsidian (本地写作)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ git push
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;GitHub 私有仓库 (snowfalling/Blog)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ GitHub Actions 自动触发
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hugo 构建 (Markdown → 静态 HTML)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ 部署
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;GitHub Pages (snowfalling.github.io)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;两个仓库各司其职：&lt;/p&gt;</description></item><item><title>归档</title><link>https://snowfalling.github.io/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://snowfalling.github.io/archives/</guid><description>archives</description></item><item><title>搜索</title><link>https://snowfalling.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://snowfalling.github.io/search/</guid><description>search</description></item></channel></rss>

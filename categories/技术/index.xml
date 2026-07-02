@@ -1,1 +1,60 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>技术 on Ronald's Blog</title><link>https://snowfalling.github.io/categories/%E6%8A%80%E6%9C%AF/</link><description>Recent content in 技术 on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Tue, 16 Jun 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/categories/%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>Git Submodule 实战指南：从入门到日常使用</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 16 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid><description>结合 Hugo 博客中管理 PaperMod 主题的真实场景，系统梳理 Git Submodule 的核心概念、常用操作和踩坑经验。</description></item><item><title>使用 Hugo + Obsidian + GitHub Pages 搭建个人博客</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</link><pubDate>Thu, 11 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</guid><description>记录从零搭建基于 Hugo 的个人博客全过程，实现 Obsidian 写作、自动构建、GitHub Pages 部署的完整工作流。</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>技术 on Ronald's Blog</title><link>https://snowfalling.github.io/categories/%E6%8A%80%E6%9C%AF/</link><description>Recent content in 技术 on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Tue, 16 Jun 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/categories/%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss+xml"/><item><title>Git Submodule 实战指南：从入门到日常使用</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 16 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/git-submodule-%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/</guid><description>&lt;h2 id="什么是-git-submodule"&gt;
+ 什么是 Git Submodule
+ 
+ &lt;a class="heading-anchor" href="#%e4%bb%80%e4%b9%88%e6%98%af-git-submodule" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;Git Submodule 允许你在一个 Git 仓库中嵌套另一个独立的 Git 仓库。父仓库只记录子仓库的&lt;strong&gt;特定 commit&lt;/strong&gt;，而不是子仓库的全部内容。&lt;/p&gt;
+&lt;p&gt;典型使用场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;项目依赖第三方库，且需要锁定版本（如 Hugo 主题）&lt;/li&gt;
+&lt;li&gt;多个项目共享同一组公共模块&lt;/li&gt;
+&lt;li&gt;主项目和子项目需要独立的版本控制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以本博客为例，目录结构如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Blog/ # 父仓库（私有）
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── .gitmodules # 子模块配置文件
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── content/posts/ # 博客文章
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── themes/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └── PaperMod/ # 子模块 → hugo-PaperMod 仓库
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── hugo.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id="添加子模块"&gt;
+ 添加子模块
+ 
+ &lt;a class="heading-anchor" href="#%e6%b7%bb%e5%8a%a0%e5%ad%90%e6%a8%a1%e5%9d%97" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 将 PaperMod 主题作为子模块添加到 themes/PaperMod&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;执行后会产生两个变化：&lt;/p&gt;</description></item><item><title>使用 Hugo + Obsidian + GitHub Pages 搭建个人博客</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</link><pubDate>Thu, 11 Jun 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/%E5%8D%9A%E5%AE%A2%E6%9E%84%E5%BB%BA%E6%96%B9%E6%A1%88/</guid><description>&lt;h2 id="为什么选择这套方案"&gt;
+ 为什么选择这套方案
+ 
+ &lt;a class="heading-anchor" href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%80%89%e6%8b%a9%e8%bf%99%e5%a5%97%e6%96%b9%e6%a1%88" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;在选择博客方案时，我有几个核心需求：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;用 Obsidian 写作&lt;/strong&gt; — 日常笔记和博客统一管理，不想切换工具&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;私有内容保护&lt;/strong&gt; — 有些笔记是私密的，不能发布到公网&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自动化部署&lt;/strong&gt; — 推送即发布，不想手动操作&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;免费托管&lt;/strong&gt; — GitHub Pages 完美满足&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;最终方案：Obsidian 写作 → GitHub 私有仓库 → Hugo 构建 → GitHub Pages 部署。&lt;/p&gt;
+
+
+&lt;h2 id="架构概览"&gt;
+ 架构概览
+ 
+ &lt;a class="heading-anchor" href="#%e6%9e%b6%e6%9e%84%e6%a6%82%e8%a7%88" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Obsidian (本地写作)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ git push
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;GitHub 私有仓库 (snowfalling/Blog)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ GitHub Actions 自动触发
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hugo 构建 (Markdown → 静态 HTML)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ↓ 部署
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;GitHub Pages (snowfalling.github.io)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;两个仓库各司其职：&lt;/p&gt;</description></item></channel></rss>
