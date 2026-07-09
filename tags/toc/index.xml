@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TOC on Ronald's Blog</title><link>https://snowfalling.github.io/tags/toc/</link><description>Recent content in TOC on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Thu, 09 Jul 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/tags/toc/index.xml" rel="self" type="application/rss+xml"/><item><title>Hugo 文章目录（TOC）生成机制与踩坑</title><link>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/hugo-%E7%9B%AE%E5%BD%95%E7%94%9F%E6%88%90%E6%9C%BA%E5%88%B6/</link><pubDate>Thu, 09 Jul 2026 10:00:00 +0800</pubDate><guid>https://snowfalling.github.io/posts/%E5%85%B6%E4%BB%96/hugo-%E7%9B%AE%E5%BD%95%E7%94%9F%E6%88%90%E6%9C%BA%E5%88%B6/</guid><description>&lt;h2 id="目录是怎么来的"&gt;
+ 目录是怎么来的
+ 
+ &lt;a class="heading-anchor" href="#%e7%9b%ae%e5%bd%95%e6%98%af%e6%80%8e%e4%b9%88%e6%9d%a5%e7%9a%84" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;Hugo 的文章目录不是主题手写的，而是 Markdown 渲染器根据正文里的标题（&lt;code&gt;#&lt;/code&gt;、&lt;code&gt;##&lt;/code&gt;……）自动扫描生成的。在模板里通过页面变量 &lt;code&gt;.TableOfContents&lt;/code&gt; 拿到一段现成的 &lt;code&gt;&amp;lt;nav&amp;gt;&lt;/code&gt; HTML：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-go-html-template" data-lang="go-html-template"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="cp"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;.TableOfContents&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cp"&gt;}}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;它输出的结构大致是嵌套的 &lt;code&gt;&amp;lt;ul&amp;gt;/&amp;lt;li&amp;gt;&lt;/code&gt;，每个 &lt;code&gt;&amp;lt;li&amp;gt;&lt;/code&gt; 对应一个标题、锚点指向标题的自动 &lt;code&gt;id&lt;/code&gt;。&lt;strong&gt;你能控制的只有「哪些标题进目录」和「怎么渲染这段 HTML」，标题本身的层级关系由正文决定。&lt;/strong&gt;&lt;/p&gt;
+
+
+&lt;h2 id="三个关键配置项"&gt;
+ 三个关键配置项
+ 
+ &lt;a class="heading-anchor" href="#%e4%b8%89%e4%b8%aa%e5%85%b3%e9%94%ae%e9%85%8d%e7%bd%ae%e9%a1%b9" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;在 &lt;code&gt;hugo.toml&lt;/code&gt; 里：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-toml" data-lang="toml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;markup&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;tableOfContents&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;startLevel&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="c"&gt;# 从哪一级标题开始收录&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;endLevel&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="c"&gt;# 收录到哪一级为止&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;ordered&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt; &lt;span class="c"&gt;# true 输出有序列表 &amp;lt;ol&amp;gt;，false 输出 &amp;lt;ul&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;startLevel = 2&lt;/code&gt; 意味着 &lt;strong&gt;H1（&lt;code&gt;#&lt;/code&gt;）不会进目录&lt;/strong&gt;，从 H2（&lt;code&gt;##&lt;/code&gt;）开始收。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;endLevel = 4&lt;/code&gt; 表示比 H4 更深的标题（H5/H6）不进目录。&lt;/li&gt;
+&lt;li&gt;只有落在 &lt;code&gt;[startLevel, endLevel]&lt;/code&gt; 区间内的标题才会出现在目录里。&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2 id="主题侧的渲染逻辑"&gt;
+ 主题侧的渲染逻辑
+ 
+ &lt;a class="heading-anchor" href="#%e4%b8%bb%e9%a2%98%e4%be%a7%e7%9a%84%e6%b8%b2%e6%9f%93%e9%80%bb%e8%be%91" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;拿到 &lt;code&gt;.TableOfContents&lt;/code&gt; 之后，是否显示、怎么显示由主题的 partial 决定。本站主题 &lt;code&gt;layouts/partials/toc.html&lt;/code&gt;：&lt;/p&gt;</description></item></channel></rss>
