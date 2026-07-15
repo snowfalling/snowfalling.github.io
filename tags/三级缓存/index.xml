@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>三级缓存 on Ronald's Blog</title><link>https://snowfalling.github.io/tags/%E4%B8%89%E7%BA%A7%E7%BC%93%E5%AD%98/</link><description>Recent content in 三级缓存 on Ronald's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 15 Jul 2026 10:53:54 +0800</lastBuildDate><atom:link href="https://snowfalling.github.io/tags/%E4%B8%89%E7%BA%A7%E7%BC%93%E5%AD%98/index.xml" rel="self" type="application/rss+xml"/><item><title>spring循环依赖</title><link>https://snowfalling.github.io/posts/spring/spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/</link><pubDate>Wed, 15 Jul 2026 10:53:54 +0800</pubDate><guid>https://snowfalling.github.io/posts/spring/spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/</guid><description>&lt;h2 id="什么是循环依赖"&gt;
+ 什么是循环依赖
+ 
+ &lt;a class="heading-anchor" href="#%e4%bb%80%e4%b9%88%e6%98%af%e5%be%aa%e7%8e%af%e4%be%9d%e8%b5%96" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;循环依赖指两个或多个 Bean 相互引用，形成闭环。比如 A 依赖 B，B 又依赖 A：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Component&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Autowired&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Component&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Autowired&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果没有特殊处理，创建 A 时要先创建 B，创建 B 时又要先创建 A，就会陷入死循环。&lt;/p&gt;
+
+
+&lt;h2 id="核心机制三级缓存"&gt;
+ 核心机制：三级缓存
+ 
+ &lt;a class="heading-anchor" href="#%e6%a0%b8%e5%bf%83%e6%9c%ba%e5%88%b6%e4%b8%89%e7%ba%a7%e7%bc%93%e5%ad%98" aria-label="锚点"&gt;#&lt;/a&gt;
+ 
+&lt;/h2&gt;
+&lt;p&gt;Spring 解决循环依赖的核心是&lt;strong&gt;三级缓存&lt;/strong&gt;，都定义在 &lt;code&gt;DefaultSingletonBeanRegistry&lt;/code&gt; 中。&lt;/p&gt;</description></item></channel></rss>
