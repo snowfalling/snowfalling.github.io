@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3aa6a0"/>
+      <stop offset="1" stop-color="#6ea8fe"/>
+    </linearGradient>
+  </defs>
+  <!-- 实底渐变方，favicon 独立醒目 -->
+  <rect x="0.5" y="0.5" width="63" height="63" rx="16" fill="url(#g)"/>
+  <!-- 白色雪花 -->
+  <g stroke="#ffffff" stroke-linecap="round" stroke-width="2.4" fill="none">
+    <path d="M32 10v44"/>
+    <path d="M10 32h44"/>
+    <path d="M16.4 16.4l31.2 31.2"/>
+    <path d="M47.6 16.4L16.4 47.6"/>
+    <path d="M32 16l5.5 3.4"/>
+    <path d="M32 16l-5.5 3.4"/>
+    <path d="M32 48l5.5-3.4"/>
+    <path d="M32 48l-5.5-3.4"/>
+    <path d="M16 32l3.4 5.5"/>
+    <path d="M16 32l3.4-5.5"/>
+    <path d="M48 32l-3.4 5.5"/>
+    <path d="M48 32l-3.4-5.5"/>
+  </g>
+  <circle cx="32" cy="32" r="3.2" fill="#ffffff"/>
+</svg>
